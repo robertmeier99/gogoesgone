@@ -112,17 +112,20 @@ def get_mzz_from_references(flist, save=False, save_file="./combined.json"):
         return mzz.translate()
 
 
-def get_mapper_from_mzz(flist,json_file=None):
-    if save_file == None:
-        fs = fsspec.filesystem(
-            "reference",
-            fo=get_mzz_from_references(flist),
-            remote_protocol="s3",
-            remote_options={"anon": True},
-            skip_instance_cache=True,
+def get_mapper_from_mzz(flist):
+
+    fs = fsspec.filesystem(
+        "reference",
+        fo=get_mzz_from_references(flist),
+        remote_protocol="s3",
+        remote_options={"anon": True},
+        skip_instance_cache=True,
         )
-    else:
-        fs = fsspec.filesystem(
+    return fs.get_mapper("")
+
+def get_mapper_from_json(json_file):
+
+    fs = fsspec.filesystem(
         "reference",
         fo=json_file,
         remote_protocol="s3",
