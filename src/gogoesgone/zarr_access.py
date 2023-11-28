@@ -121,3 +121,13 @@ def get_mapper_from_mzz(flist):
         skip_instance_cache=True,
     )
     return fs.get_mapper("")
+
+def get_mapper_from_json(json_file):
+    fs = fsspec.filesystem(
+        "reference",
+        fo=json_file,
+        remote_protocol="s3",
+        remote_options={"anon": True},
+        skip_instance_cache=True,
+    )
+    return fs.get_mapper("")
