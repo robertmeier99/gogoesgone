@@ -10,16 +10,23 @@ import numpy as np
 
 
 def generate_globsearch_string(
-    year, dayofyear, hour=None, channel=13, product="ABI-L2-CMIPF", satellite="goes16"
+    year, dayofyear, hour=None, channel=None, product="ABI-L2-CMIPF", satellite="goes16"
 ):
     """returns string for glob search in AWS
 
     if hour is not provided, it will download for all files in the given day
+    if a product does not use a specified channel, the channel does not need to be provided
     """
     if hour is None:
-        return f"s3://noaa-{satellite}/{product}/{year}/{str(dayofyear).zfill(3)}/*/*C{str(channel).zfill(2)}*.nc"
+        if channel is None:
+            return f"s3://noaa-{satellite}/{product}/{year}/{str(dayofyear).zfill(3)}/*/*.nc"
+        else:
+            return f"s3://noaa-{satellite}/{product}/{year}/{str(dayofyear).zfill(3)}/*/*C{str(channel).zfill(2)}*.nc"
     else:
-        return f"s3://noaa-{satellite}/{product}/{year}/{str(dayofyear).zfill(3)}/{str(hour).zfill(2)}/*C{str(channel).zfill(2)}*.nc"
+        if channel is None:
+            return f"s3://noaa-{satellite}/{product}/{year}/{str(dayofyear).zfill(3)}/{str(hour).zfill(2)}/*.nc"
+        else:
+            return f"s3://noaa-{satellite}/{product}/{year}/{str(dayofyear).zfill(3)}/{str(hour).zfill(2)}/*C{str(channel).zfill(2)}*.nc"
 
 
 def generate_url_list(globsearch_string):
@@ -36,7 +43,7 @@ def generate_url_list(globsearch_string):
         return flist
 
 
-def nearest_time_url(time, format="%Y%m%d %H:%M:%S", channel=13, product="ABI-L2-CMIPF", satellite="goes16"):
+def nearest_time_url(time, format="%Y%m%d %H:%M:%S", channel=None, product="ABI-L2-CMIPF", satellite="goes16"):
     """Returns URL of file with nearest observation starting time to provided time
 
     Accuracy only to the nearest second
