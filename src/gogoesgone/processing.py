@@ -4,6 +4,7 @@ import os
 import numpy as np
 import xarray as xr
 import fsspec
+import pickle
 
 
 class Image:
@@ -47,7 +48,7 @@ class Image:
                 compat="override",
             )
         elif type(filepath) == fsspec.mapping.FSMap:
-            self.dataset = xr.open_dataset(filepath, engine="zarr")
+            self.dataset = xr.open_dataset(filepath, engine="zarr", consolidated=False)
         else:
             print(
                 "Provided 'filepath' argument was not any of string (single file), list (mfdataset) or FSMap. Therefore, instance created without data and attributes."
@@ -275,3 +276,16 @@ class Image:
                 print("Please provide list or tuple of length 2.")
         else:
             print("Please check input types")
+
+
+def subset_region_from_latlon_extents(ds, extents, unit="degree"):
+    w_extent, e_extent, s_extent, n_extent = extents
+
+    return ds.where(
+        (ds.lat >= s_extent)
+        & (ds.lat <= n_extent)
+        & (ds.lon >= w_extent)
+        & (ds.lon <= e_extent),
+        drop=True,
+    )
+
